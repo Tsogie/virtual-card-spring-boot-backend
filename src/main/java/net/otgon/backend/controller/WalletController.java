@@ -29,17 +29,18 @@ public class WalletController {
     }
 
 
+    //ResponseEntity<Map<String, Object>>
     @PostMapping("/redeem")
-    public ResponseEntity<Map<String, Object>> redeemQR(@RequestBody RedeemRequestDto redeemRequestDto) {
+    public ResponseEntity<String> redeemQR(@RequestBody RedeemRequestDto redeemRequestDto) {
 
         System.out.println("Incoming token: " + redeemRequestDto.getToken());
 
         String resultMessage = qrService.redeemByQr(redeemRequestDto);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", resultMessage);
-        response.put("requested fare", redeemRequestDto.getFare());
-        return ResponseEntity.ok(response);
+        //Map<String, Object> response = new HashMap<>();
+        //response.put("status", resultMessage);
+        //response.put("requested fare", redeemRequestDto.getFare());
+        return ResponseEntity.ok(resultMessage);
     }
 
 
@@ -49,5 +50,10 @@ public class WalletController {
         return ResponseEntity.ok(response);
 
     }
+
+//    public ResponseBody<String> getTransactions(){
+//
+//
+//    }
 
 }

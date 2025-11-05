@@ -41,7 +41,8 @@ public class UserController {
     @GetMapping("/userinfo")
     public ResponseEntity<?> getUserInfo(@RequestHeader("Authorization") String authHeader) {
         try {
-            String token = authHeader.replace("Bearer ", ""); // remove prefix
+            String token = authHeader.replace("Bearer ", "");
+            System.out.println("Getting user info: " + token);
             return ResponseEntity.ok(userService.getUserInfo(token));
         } catch (Exception e) {
             return ResponseEntity.status(401).body("Invalid or missing token");
