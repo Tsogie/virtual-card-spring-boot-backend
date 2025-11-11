@@ -1,12 +1,18 @@
 package net.otgon.backend.service;
 
+import jakarta.transaction.Transactional;
+import net.otgon.backend.dto.TopUpResponse;
 import net.otgon.backend.entity.Card;
 import net.otgon.backend.entity.Transaction;
 import net.otgon.backend.repository.CardRepo;
 import net.otgon.backend.repository.TransactionRepo;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class WalletService {
@@ -19,18 +25,19 @@ public class WalletService {
         this.transactionRepo = transactionRepo;
     }
 
-    public String topup(String cardId) {
-
+    /** Transactional, Ensures the balance update + transaction logging is atomic.
+     * If something fails in the middle, nothing gets saved.**/
+    @Transactional
+    public TopUpResponse topup(String cardId) {
         double amount = 5;
         Card card = cardRepo.findById(cardId)
-                .orElseThrow(() -> new RuntimeException("Card not found"));
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Card not found"));
 
         double newBalance = card.getBalance() + amount;
         card.setBalance(newBalance);
         cardRepo.save(card);
 
-       //Log transaction
+        // Log transaction
         Transaction txn = new Transaction();
         txn.setCard(card);
         txn.setType("TOPUP");
@@ -38,7 +45,7 @@ public class WalletService {
         txn.setTimestamp(LocalDateTime.now());
         transactionRepo.save(txn);
 
-
-        return "Success, new balance: " + newBalance;
+        return new TopUpResponse(true, newBalance);
     }
+
 }

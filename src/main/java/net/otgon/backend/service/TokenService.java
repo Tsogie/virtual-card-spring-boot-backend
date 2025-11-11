@@ -3,6 +3,7 @@ package net.otgon.backend.service;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import net.otgon.backend.dto.RedeemRequestDto;
+import net.otgon.backend.dto.RedeemResult;
 import net.otgon.backend.entity.Card;
 import net.otgon.backend.entity.QrToken;
 import net.otgon.backend.repository.CardRepo;
@@ -16,12 +17,12 @@ import java.util.Date;
 import java.util.UUID;
 
 @Service
-public class QrService {
+public class TokenService {
 
     private final QrTokenRepo qrTokenRepo;
     private final CardRepo cardRepo;
 
-    public QrService(QrTokenRepo qrTokenRepo, CardRepo cardRepo) {
+    public TokenService(QrTokenRepo qrTokenRepo, CardRepo cardRepo) {
         this.qrTokenRepo = qrTokenRepo;
         this.cardRepo = cardRepo;
     }
@@ -46,7 +47,7 @@ public class QrService {
         token.setJti(jti);
         token.setCardId(cardId);
         token.setIssuedAt(LocalDateTime.now());
-        token.setExpiresAt(LocalDateTime.now().plusSeconds(60));
+        token.setExpiresAt(LocalDateTime.now().plusSeconds(180));
         token.setUsed(false);
 
         qrTokenRepo.save(token);
@@ -55,8 +56,7 @@ public class QrService {
 
     }
 
-    public String redeemByQr(RedeemRequestDto redeemRequestDto) {
-
+    public RedeemResult redeemByToken(RedeemRequestDto redeemRequestDto) {
         String token = redeemRequestDto.getToken();
         double fare = redeemRequestDto.getFare();
 
@@ -68,30 +68,36 @@ public class QrService {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException e) {
-            return "Token has expired";
+            return new RedeemResult("Token has expired", -1, fare);
         } catch (JwtException e) {
-            return "Invalid token";
+            return new RedeemResult("Invalid token", -1, fare);
         }
 
         String tokenId = claims.getId();
 
-        QrToken foundToken = qrTokenRepo.findById(tokenId).orElseThrow();
+        QrToken foundToken = qrTokenRepo.findById(tokenId)
+                .orElseThrow(() -> new IllegalArgumentException("Token not found"));
 
-        if(foundToken.isUsed()){
-            return "Token is already used";
-        }else{
-
-            Card foundCard = cardRepo.findById(foundToken.getCardId()).orElseThrow();
-            if(foundCard.getBalance() < fare){
-                return "Insufficient funds";
-            }
-
-            foundCard.setBalance(foundCard.getBalance() - fare);
-            cardRepo.save(foundCard);
-            foundToken.setUsed(true);
-            qrTokenRepo.save(foundToken);
+        if (foundToken.isUsed()) {
+            return new RedeemResult("Token is already used", -1, fare);
         }
-        return "Success";
+
+        Card foundCard = cardRepo.findById(foundToken.getCardId())
+                .orElseThrow(() -> new IllegalArgumentException("Card not found"));
+
+        if (foundCard.getBalance() < fare) {
+            return new RedeemResult("Insufficient funds", foundCard.getBalance(), fare);
+        }
+
+        double newBalance = foundCard.getBalance() - fare;
+        foundCard.setBalance(newBalance);
+        cardRepo.save(foundCard);
+
+        foundToken.setUsed(true);
+        qrTokenRepo.save(foundToken);
+
+        return new RedeemResult("Success", newBalance, fare);
     }
+
 }
 
