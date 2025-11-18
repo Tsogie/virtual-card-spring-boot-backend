@@ -24,5 +24,7 @@ public class Card {
     @JsonIgnore
     private User user;
 
+    @Column(name = "balance")
     private double balance = 0.0;
+
 }

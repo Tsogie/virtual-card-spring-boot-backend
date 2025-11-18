@@ -1,6 +1,9 @@
 package net.otgon.backend.controller;
 
 import lombok.AllArgsConstructor;
+import net.otgon.backend.dto.DeviceRegisterRequest;
+import net.otgon.backend.dto.DeviceRegisterResponse;
+import net.otgon.backend.entity.Device;
 import net.otgon.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,19 +19,22 @@ public class DeviceController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerDevice(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<DeviceRegisterResponse> registerDevice(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody DeviceRegisterRequest request) {
         try {
             String token = authHeader.replace("Bearer ", "");
-            String deviceKey = userService.registerDevice(token);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("deviceKey", deviceKey);
-            response.put("message", "Device registered successfully");
-
+            DeviceRegisterResponse response = userService.registerDevice(token, request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
+            // Return 401 with a minimal response containing error info
+            DeviceRegisterResponse errorResponse = new DeviceRegisterResponse(
+                    null,
+                    "Error: " + e.getMessage()
+            );
+            return ResponseEntity.status(401).body(errorResponse);
         }
     }
+
 }
 

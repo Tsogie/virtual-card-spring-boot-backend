@@ -43,10 +43,4 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
-    //    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-//    private List<Transaction> transactions;
-//
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-//    private List<Journey> journeys;
-
 }

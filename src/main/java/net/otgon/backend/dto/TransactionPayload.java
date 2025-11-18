@@ -5,14 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
 @Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RedeemDeviceRequestDto {
-
-    private String deviceId;
-    private String payload;     // Raw transaction JSON, Base64 encoded
-    private String signature;
-
+public class TransactionPayload {
+    private String txId;
+    private double fare;
+    private long timestamp;
 }
