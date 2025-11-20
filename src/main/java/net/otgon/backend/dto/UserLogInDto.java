@@ -5,25 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
-import java.time.LocalDateTime;
-import java.util.UUID;
-
-@Setter
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
-
-    private UUID id;
+public class UserLogInDto {
 
     private String username;
 
     private String password;
 
-    private String email;
-
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    private LocalDateTime updatedAt;
 }

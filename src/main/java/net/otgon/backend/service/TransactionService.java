@@ -1,10 +1,5 @@
 package net.otgon.backend.service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import net.otgon.backend.dto.TransactionResponseDto;
 import net.otgon.backend.entity.Card;
 import net.otgon.backend.entity.TopUpTransaction;
@@ -15,43 +10,32 @@ import net.otgon.backend.repository.TransactionRepo;
 import net.otgon.backend.repository.UserRepo;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.*;
 
 @Service
 public class TransactionService {
 
-    // ✅ SAME SECRET AS UserService
-    private static final String SECRET = "mySuperSecretKeyForJWTSigning12345";
-    private final Key secretKey = Keys.hmacShaKeyFor(SECRET.getBytes());
-
     private final UserRepo userRepo;
     private final TransactionRepo transactionRepo;
     private final TopUpTransactionRepo topUpTransactionRepo;
+    private final JwtService jwtService;
 
     public TransactionService(UserRepo userRepo,
                               TransactionRepo transactionRepo,
-                              TopUpTransactionRepo topUpTransactionRepo) {
+                              TopUpTransactionRepo topUpTransactionRepo,
+                              JwtService jwtService) {
         this.userRepo = userRepo;
         this.transactionRepo = transactionRepo;
         this.topUpTransactionRepo = topUpTransactionRepo;
+        this.jwtService = jwtService;
     }
 
     public List<TransactionResponseDto> getAllUserTransactions(String jwt) {
         // Extract username from JWT
-        String username;
-        try {
-            Jws<Claims> claimsJws = Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(jwt);
-
-            username = claimsJws.getBody().getSubject();
-        } catch (JwtException e) {
-            throw new RuntimeException("Invalid token", e);
-        }
+        String username = jwtService.extractUsername(jwt);
 
         // 1. Get user and card
         User user = userRepo.findByUsername(username)

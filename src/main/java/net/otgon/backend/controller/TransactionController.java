@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/transactions")
+@RequestMapping("/api")
 public class TransactionController {
 
     private final TransactionService transactionService;
@@ -19,19 +19,27 @@ public class TransactionController {
 
     /**
      * Get all transactions (deductions + top-ups) for the authenticated user
-     * @param token JWT token from Authorization header
+     * @param authHeader header
      * @return List of unified transactions sorted by date (newest first)
      */
-    @GetMapping
+    @GetMapping("/transactions")
     public ResponseEntity<List<TransactionResponseDto>> getUserTransactions(
-            @RequestHeader("Authorization") String token) {
+            @RequestHeader("Authorization") String authHeader) {
 
-        // Extract JWT and get username
-        String jwt = token.replace("Bearer ", "");
 
-        List<TransactionResponseDto> transactions =
-                transactionService.getAllUserTransactions(jwt);
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            System.out.println("Getting transactions: " + token);
 
-        return ResponseEntity.ok(transactions);
+            List<TransactionResponseDto> transactions =
+                    transactionService.getAllUserTransactions(token);
+
+            return ResponseEntity.ok(transactions);
+        } catch (Exception e) {
+            System.err.println("Error fetching transactions: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(401).build();
+        }
+
     }
 }

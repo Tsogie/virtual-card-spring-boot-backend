@@ -1,6 +1,7 @@
 package net.otgon.backend.controller;
 
 import net.otgon.backend.dto.UserDto;
+import net.otgon.backend.dto.UserLogInDto;
 import net.otgon.backend.entity.User;
 import net.otgon.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,20 +20,46 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
-    public ResponseEntity<User> addUser(@RequestBody UserDto userDto) {
-        User addedUser = userService.createNewUser(userDto);
-        return new  ResponseEntity<>(addedUser, HttpStatus.CREATED);
+    //Returning JWT as a response which will used to log in automatically
+    @PostMapping("/register")
+    public ResponseEntity<String> register(@RequestBody UserDto userDto) {
+        if (userDto.getUsername() == null || userDto.getPassword() == null) {
+            return ResponseEntity.badRequest().body("Username and password required");
+        }
+        try {
+            String token = userService
+                    .register(userDto.getUsername(), userDto.getPassword(), userDto.getEmail());
+            return ResponseEntity.ok(token);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody String username) {
-        System.out.println("Incoming username: " + username);
-        String token = userService.login(username);
+    public ResponseEntity<String> login(@RequestBody UserLogInDto userLogInDto) {
+
+        if (userLogInDto.getUsername() == null || userLogInDto.getPassword() == null) {
+            return ResponseEntity.badRequest().body("Username and password required");
+        }
+
+        String username =  userLogInDto.getUsername();
+        String password = userLogInDto.getPassword();
+
+        System.out.println("[LogIn] Incoming username: " + userLogInDto.getUsername());
+        System.out.println("[LogIn] Incoming password: " + userLogInDto.getPassword());
+
+        String token;
+
+        try {
+            token = userService.loginWithPassword(username, password);
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("Invalid credentials");
+        }
 
         if (token == null) {
             return ResponseEntity.status(404).body("User not found");
         }
+        System.out.println("[LogIn] Sending token: " + token);
 
         return ResponseEntity.ok(token);
     }

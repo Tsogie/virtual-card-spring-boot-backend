@@ -12,7 +12,9 @@ import net.otgon.backend.entity.User;
 import net.otgon.backend.mapper.UserMapper;
 import net.otgon.backend.repository.DeviceRepo;
 import net.otgon.backend.repository.UserRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -23,66 +25,75 @@ public class UserService {
 
     private final UserRepo userRepo;
     private final DeviceRepo deviceRepo;
-    private Key secretKey;
+    private final JwtService jwtService;
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Value("${jwt.expiration:3600000}")
     private long jwtExpiration;
 
-    public UserService(UserRepo userRepo, DeviceRepo deviceRepo) {
+    public UserService(UserRepo userRepo, DeviceRepo deviceRepo, JwtService jwtService) {
         this.userRepo = userRepo;
         this.deviceRepo = deviceRepo;
-        this.secretKey = null;
+        this.jwtService = jwtService;
     }
 
-    @PostConstruct
-    private void init() {
-        if (jwtSecret == null || jwtSecret.isEmpty()) {
-            throw new RuntimeException("JWT secret is not configured. Set jwt.secret in application.properties or JWT_SECRET env var");
+
+    public String register(String username, String password, String email) {
+        // Check if user exists
+        if (userRepo.findByUsername(username).isPresent()) {
+            throw new RuntimeException("Username already exists");
         }
-        secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
-    }
 
-    public User createNewUser(UserDto userDto) {
-        User addedUser = UserMapper.mapToUse(userDto);
+        // Create new user
+        User newUser = new User();
+        newUser.setUsername(username);
+        newUser.setPassword(passwordEncoder.encode(password));
+        newUser.setEmail(email);
 
+        // Create card for user
         Card card = new Card();
         card.setId(UUID.randomUUID().toString());
-        card.setBalance(10);
-        card.setUser(addedUser);
-        addedUser.setCard(card);
+        card.setBalance(10); // Initial balance
+        card.setUser(newUser);
+        newUser.setCard(card);
 
-        return userRepo.save(addedUser);
-    }
+        userRepo.save(newUser);
 
-    public String login(String username) {
-        Optional<User> userOpt = userRepo.findByUsername(username);
-        if (userOpt.isEmpty()) {
-            return null; // user not found
-        }
-
-        User foundUser = userOpt.get();
-
+        // Generate JWT
         return Jwts.builder()
-                .setSubject(foundUser.getUsername())
+                .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .signWith(jwtService.getSecretKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String loginWithPassword(String username, String password) {
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Verify password
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
+
+        // Generate JWT
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .signWith(jwtService.getSecretKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     // Extract username directly here instead of using jwtService
     public Map<String, Object> getUserInfo(String token) {
         try {
-            Jws<Claims> claimsJws = Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(token);
 
-            String username = claimsJws.getBody().getSubject();
-
+            String username = jwtService.extractUsername(token);
             User user = userRepo.findByUsername(username).orElse(null);
             if (user == null) {
                 throw new RuntimeException("User not found");
@@ -105,7 +116,7 @@ public class UserService {
     public DeviceRegisterResponse registerDevice(String token, DeviceRegisterRequest request) {
         try {
             String username = Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
+                    .setSigningKey(jwtService.getSecretKey())
                     .build()
                     .parseClaimsJws(token)
                     .getBody()

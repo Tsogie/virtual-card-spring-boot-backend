@@ -17,14 +17,17 @@ import java.time.LocalDateTime;
 public class User {
 
     @Id
-    @Column(length = 36, nullable = false)
-    String id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     @Column(nullable = false, unique = true, length = 50)
     private String username;
 
     @Column(nullable = false, unique = true, length = 100)
     private String email;
+
+    @Column(nullable = false)
+    private String password;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Card card;
