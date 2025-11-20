@@ -2,6 +2,7 @@ package net.otgon.backend.service;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import net.otgon.backend.dto.DeviceRegisterRequest;
 import net.otgon.backend.dto.DeviceRegisterResponse;
 import net.otgon.backend.dto.UserDto;
@@ -9,9 +10,9 @@ import net.otgon.backend.entity.Card;
 import net.otgon.backend.entity.Device;
 import net.otgon.backend.entity.User;
 import net.otgon.backend.mapper.UserMapper;
-import net.otgon.backend.repository.CardRepo;
 import net.otgon.backend.repository.DeviceRepo;
 import net.otgon.backend.repository.UserRepo;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -22,16 +23,26 @@ public class UserService {
 
     private final UserRepo userRepo;
     private final DeviceRepo deviceRepo;
+    private Key secretKey;
 
+    @Value("${jwt.secret}")
+    private String jwtSecret;
 
-    // Keep a fixed secret key (in real apps, use env var or config file)
-    private static final String SECRET = "mySuperSecretKeyForJWTSigning12345";
-    private final Key secretKey = Keys.hmacShaKeyFor(SECRET.getBytes());
+    @Value("${jwt.expiration:3600000}")
+    private long jwtExpiration;
 
     public UserService(UserRepo userRepo, DeviceRepo deviceRepo) {
         this.userRepo = userRepo;
         this.deviceRepo = deviceRepo;
+        this.secretKey = null;
+    }
 
+    @PostConstruct
+    private void init() {
+        if (jwtSecret == null || jwtSecret.isEmpty()) {
+            throw new RuntimeException("JWT secret is not configured. Set jwt.secret in application.properties or JWT_SECRET env var");
+        }
+        secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
     public User createNewUser(UserDto userDto) {
@@ -39,7 +50,7 @@ public class UserService {
 
         Card card = new Card();
         card.setId(UUID.randomUUID().toString());
-        card.setBalance(10.0);
+        card.setBalance(10);
         card.setUser(addedUser);
         addedUser.setCard(card);
 
@@ -54,12 +65,11 @@ public class UserService {
 
         User foundUser = userOpt.get();
 
-        long expirationTime = 1000 * 60 * 60; // 1 hour
         return Jwts.builder()
                 .setSubject(foundUser.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(secretKey)
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -81,9 +91,9 @@ public class UserService {
             Map<String, Object> info = new HashMap<>();
             info.put("username", user.getUsername());
             info.put("email", user.getEmail());
-            // ✅ Assuming balance comes from Card
             info.put("cardId", user.getCard().getId());
-            info.put("balance", user.getCard() != null ? user.getCard().getBalance() : 0.0);
+            // Safe null check for card
+            info.put("balance", user.getCard() != null ? user.getCard().getBalance() : 0);
 
             return info;
 
@@ -113,7 +123,7 @@ public class UserService {
 
             Device device = new Device();
             device.setUser(user);
-            device.setPublicKey(request.getPublicKey()); // NEW
+            device.setPublicKey(request.getPublicKey());
             System.out.println("Device Registration: " + request.getPublicKey());
 
             Device saved = deviceRepo.save(device);
