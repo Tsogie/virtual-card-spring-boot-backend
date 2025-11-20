@@ -46,7 +46,6 @@ public class UserController {
         String password = userLogInDto.getPassword();
 
         System.out.println("[LogIn] Incoming username: " + userLogInDto.getUsername());
-        System.out.println("[LogIn] Incoming password: " + userLogInDto.getPassword());
 
         String token;
 
