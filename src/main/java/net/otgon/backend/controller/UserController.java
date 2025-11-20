@@ -1,11 +1,10 @@
 package net.otgon.backend.controller;
 
-import net.otgon.backend.dto.UserDto;
-import net.otgon.backend.dto.UserLogInDto;
-import net.otgon.backend.entity.User;
+import jakarta.validation.Valid;
+import net.otgon.backend.dto.LoginRequestDto;
+import net.otgon.backend.dto.RegisterRequestDto;
 import net.otgon.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +21,7 @@ public class UserController {
 
     //Returning JWT as a response which will used to log in automatically
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody UserDto userDto) {
+    public ResponseEntity<String> register(@Valid @RequestBody RegisterRequestDto userDto) {
         if (userDto.getUsername() == null || userDto.getPassword() == null) {
             return ResponseEntity.badRequest().body("Username and password required");
         }
@@ -36,7 +35,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserLogInDto userLogInDto) {
+    public ResponseEntity<String> login(@Valid @RequestBody LoginRequestDto userLogInDto) {
 
         if (userLogInDto.getUsername() == null || userLogInDto.getPassword() == null) {
             return ResponseEntity.badRequest().body("Username and password required");
