@@ -47,6 +47,11 @@ public class UserService {
             throw new RuntimeException("Username already exists");
         }
 
+        // Check if email exists
+        if (userRepo.findByEmail(email).isPresent()) {
+            throw new RuntimeException("Email already registered");
+        }
+
         // Create new user
         User newUser = new User();
         newUser.setUsername(username);
@@ -115,12 +120,7 @@ public class UserService {
 
     public DeviceRegisterResponse registerDevice(String token, DeviceRegisterRequest request) {
         try {
-            String username = Jwts.parserBuilder()
-                    .setSigningKey(jwtService.getSecretKey())
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .getSubject();
+            String username = jwtService.extractUsername(token);
 
             User user = userRepo.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("User not found"));

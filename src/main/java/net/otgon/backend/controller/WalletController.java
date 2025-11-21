@@ -4,7 +4,6 @@ package net.otgon.backend.controller;
 import lombok.AllArgsConstructor;
 import net.otgon.backend.dto.*;
 import net.otgon.backend.service.RedeemService;
-import net.otgon.backend.service.TokenService;
 import net.otgon.backend.service.WalletService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,17 +14,10 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class WalletController {
 
-    private TokenService tokenService;
+
     private WalletService walletService;
     private RedeemService redeemService;
 
-    @GetMapping("/{cardId}")
-    public ResponseEntity<String> generateQr(@PathVariable String cardId) throws Exception {
-
-        String token = tokenService.generateSignedToken(cardId);
-
-        return ResponseEntity.ok(token);
-    }
 
     @PostMapping("/redeem")
     public ResponseEntity<?> redeem(@RequestBody RedeemDeviceRequestDto dto){
