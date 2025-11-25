@@ -5,7 +5,7 @@ import net.otgon.backend.entity.User;
 
 public class UserMapper {
 
-    public static User mapToUse(UserDto userDto) {
+    public static User mapToUser(UserDto userDto) {
 
         return new User(
                 userDto.getId() != null ? userDto.getId().toString() : java.util.UUID.randomUUID().toString(),

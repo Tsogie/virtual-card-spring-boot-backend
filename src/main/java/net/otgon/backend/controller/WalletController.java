@@ -20,7 +20,7 @@ public class WalletController {
 
 
     @PostMapping("/redeem")
-    public ResponseEntity<?> redeem(@RequestBody RedeemDeviceRequestDto dto){
+    public ResponseEntity<?> redeem(@Valid @RequestBody RedeemDeviceRequestDto dto){
         RedeemResult result = redeemService.redeem(dto);
         return ResponseEntity.ok(result);
 

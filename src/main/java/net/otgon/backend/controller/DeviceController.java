@@ -21,7 +21,7 @@ public class DeviceController {
     @PostMapping("/register")
     public ResponseEntity<DeviceRegisterResponse> registerDevice(
             @RequestHeader("Authorization") String authHeader,
-            @RequestBody DeviceRegisterRequest request) {
+            @Valid @RequestBody DeviceRegisterRequest request) {
         try {
             String token = authHeader.replace("Bearer ", "");
             DeviceRegisterResponse response = userService.registerDevice(token, request);
