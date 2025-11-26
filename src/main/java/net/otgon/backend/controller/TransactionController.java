@@ -26,7 +26,6 @@ public class TransactionController {
     public ResponseEntity<List<TransactionResponseDto>> getUserTransactions(
             @RequestHeader("Authorization") String authHeader) {
 
-
         try {
             String token = authHeader.replace("Bearer ", "");
             System.out.println("Getting transactions: " + token);
@@ -40,6 +39,5 @@ public class TransactionController {
             e.printStackTrace();
             return ResponseEntity.status(401).build();
         }
-
     }
 }

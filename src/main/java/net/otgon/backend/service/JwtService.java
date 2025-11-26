@@ -6,6 +6,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.*;
 import java.security.Key;
 
 @Service
@@ -44,5 +45,14 @@ public class JwtService {
             System.out.println("[JWT] Invalid token: " + e.getMessage());
             throw new RuntimeException("Invalid token", e);
         }
+    }
+
+    public String generateToken(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hour
+                .signWith(getSecretKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 }

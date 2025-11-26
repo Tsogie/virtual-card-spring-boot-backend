@@ -2,6 +2,7 @@ package net.otgon.backend.controller;
 
 
 import lombok.AllArgsConstructor;
+import jakarta.validation.Valid;
 import net.otgon.backend.dto.*;
 import net.otgon.backend.service.RedeemService;
 import net.otgon.backend.service.WalletService;
@@ -14,16 +15,13 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class WalletController {
 
-
     private WalletService walletService;
     private RedeemService redeemService;
-
 
     @PostMapping("/redeem")
     public ResponseEntity<?> redeem(@Valid @RequestBody RedeemDeviceRequestDto dto){
         RedeemResult result = redeemService.redeem(dto);
         return ResponseEntity.ok(result);
-
     }
 
     @PutMapping("/topup/{cardId}")
@@ -31,5 +29,4 @@ public class WalletController {
                                                @PathVariable String cardId){
             return ResponseEntity.ok(walletService.topup(cardId));
     }
-
 }

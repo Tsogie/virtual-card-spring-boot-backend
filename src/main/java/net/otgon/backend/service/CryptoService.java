@@ -14,7 +14,7 @@ public class CryptoService {
         try {
             byte[] decoded = Base64.getDecoder().decode(base64Key);
             X509EncodedKeySpec spec = new X509EncodedKeySpec(decoded);
-            KeyFactory factory = KeyFactory.getInstance("EC"); // <-- changed from RSA to EC
+            KeyFactory factory = KeyFactory.getInstance("EC");
             return factory.generatePublic(spec);
         } catch (Exception e) {
             throw new RuntimeException("Failed to load public key", e);
@@ -24,7 +24,7 @@ public class CryptoService {
     // Verify payload signature using SHA256withECDSA
     public boolean verify(byte[] payload, byte[] signature, PublicKey publicKey) {
         try {
-            Signature sig = Signature.getInstance("SHA256withECDSA"); // <-- match Android frontend
+            Signature sig = Signature.getInstance("SHA256withECDSA");
             sig.initVerify(publicKey);
             sig.update(payload);
             boolean isValid = sig.verify(signature);

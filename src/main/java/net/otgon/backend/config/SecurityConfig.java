@@ -34,7 +34,7 @@ public class SecurityConfig {
         configuration.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:8081",      // Metro bundler
                 "http://10.0.2.2:8081",       // Android emulator
-                "http://172.20.10.2:8081"    // Physical device
+                "http://172.20.10.2:8081"     // Physical device
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));

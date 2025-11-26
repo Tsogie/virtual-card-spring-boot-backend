@@ -1,15 +1,12 @@
 package net.otgon.backend.controller;
 
 import lombok.AllArgsConstructor;
+import jakarta.validation.Valid;
 import net.otgon.backend.dto.DeviceRegisterRequest;
 import net.otgon.backend.dto.DeviceRegisterResponse;
-import net.otgon.backend.entity.Device;
 import net.otgon.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/device")

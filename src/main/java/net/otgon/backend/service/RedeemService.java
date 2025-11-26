@@ -122,11 +122,9 @@ public class RedeemService {
         tx.setSignature(dto.getSignature());
         tx.setTimestamp(timestamp);
         tx.setProcessed(true);
-//LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault())
+        //LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault())
         transactionRepo.save(tx);
 
         return new RedeemResult("Success", newBalance, fare);
     }
-
-
 }
