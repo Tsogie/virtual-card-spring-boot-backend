@@ -48,7 +48,7 @@ public class RedeemService {
         Device device = deviceRepo.findById(dto.getDeviceId())
                 .orElseThrow(() -> new RuntimeException("Device not registered"));
 
-        // 2. Load public key
+        // 2. Load public key, converting 64 base string stored in db to PublicKey object
         System.out.println("Pub key: " + device.getPublicKey());
         PublicKey pubKey = cryptoService.loadPublicKey(device.getPublicKey());
 

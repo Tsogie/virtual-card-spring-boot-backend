@@ -9,7 +9,7 @@ import net.otgon.backend.service.WalletService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin("*")
+
 @RestController
 @RequestMapping("/api/wallet")
 @AllArgsConstructor
@@ -27,6 +27,11 @@ public class WalletController {
     @PutMapping("/topup/{cardId}")
     public ResponseEntity<TopUpResponse> topup(@RequestHeader("Authorization") String authHeader,
                                                @PathVariable String cardId){
+        //add Authorization Check on Top-Up
+        /// User could potentially top-up another user's card
+        ///   - Fix: Extract username from JWT,
+        ///verify cardId belongs to that user before processing///
+
             return ResponseEntity.ok(walletService.topup(cardId));
     }
 }

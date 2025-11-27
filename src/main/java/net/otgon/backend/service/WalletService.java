@@ -25,7 +25,6 @@ public class WalletService {
     public WalletService(CardRepo cardRepo, TopUpTransactionRepo topUpTransactionRepo) {
         this.cardRepo = cardRepo;
         this.topUpTransactionRepo = topUpTransactionRepo;
-
     }
 
     /** Transactional, Ensures the balance update + transaction logging is atomic.
