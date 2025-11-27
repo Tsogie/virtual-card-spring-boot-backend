@@ -1,6 +1,5 @@
 package net.otgon.backend.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,10 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TopUpResponse {
-
-    private boolean success;
-    private double newBalance;
+public class TopUpRequest {
     private double amount;
 
 }

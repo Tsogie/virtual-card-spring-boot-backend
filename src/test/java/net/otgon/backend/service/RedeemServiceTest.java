@@ -68,7 +68,7 @@ class RedeemServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Initialize real ObjectMapper (not mocked)
+        // Initialize real ObjectMapper
         objectMapper = new ObjectMapper();
 
         // Re-inject with real ObjectMapper

@@ -24,14 +24,14 @@ public class WalletController {
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping("/topup/{cardId}")
-    public ResponseEntity<TopUpResponse> topup(@RequestHeader("Authorization") String authHeader,
-                                               @PathVariable String cardId){
-        //add Authorization Check on Top-Up
-        /// User could potentially top-up another user's card
-        ///   - Fix: Extract username from JWT,
-        ///verify cardId belongs to that user before processing///
+    @PutMapping("/topup")
+    public TopUpResponse topup(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody TopUpRequest request) {
+        // Extract JWT from "Bearer <token>"
+        String token = authHeader.replace("Bearer ", "");
 
-            return ResponseEntity.ok(walletService.topup(cardId));
+        return walletService.topup(token, request.getAmount());
     }
+
 }
