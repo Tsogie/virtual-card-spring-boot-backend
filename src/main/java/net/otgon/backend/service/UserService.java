@@ -99,25 +99,36 @@ public class UserService {
 
     public DeviceRegisterResponse registerDevice(String token, DeviceRegisterRequest request) {
 
-            String username = jwtService.extractUsername(token);
+        String username = jwtService.extractUsername(token);
 
-            User user = userRepo.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-            Optional<Device> existing = deviceRepo.findByUser(user);
+        Device existingDevice = deviceRepo.findByUser(user).orElse(null);
+        String newKey = request.getPublicKey();
 
-            if (existing.isPresent()) {
-                System.out.println("Pub key existing reg: " +  existing.get().getPublicKey());
-                String deviceId = existing.get().getId();
-                return new DeviceRegisterResponse(deviceId, "Device already exists");
-            }
-
-            Device device = buildNewDevice(user, request.getPublicKey());
-
+        // CASE 1: User has no device yet
+        if (existingDevice == null) {
+            Device device = buildNewDevice(user, newKey);
             Device saved = deviceRepo.save(device);
             return new DeviceRegisterResponse(saved.getId(), "Device registered successfully");
+        }
 
+        String existingKey = existingDevice.getPublicKey();
+
+        // CASE 2: Device exists with same key → nothing to update
+        if (Objects.equals(existingKey, newKey)) {
+            return new DeviceRegisterResponse(existingDevice.getId(), "Device already exists");
+        }
+
+        // CASE 3: Device exists but key differs → replace device
+        existingDevice.setPublicKey(newKey);
+        existingDevice.setId(UUID.randomUUID().toString()); 
+        deviceRepo.save(existingDevice);
+
+        return new DeviceRegisterResponse(existingDevice.getId(), "Old device replaced with new one");
     }
+
 
     public Device buildNewDevice(User user, String publicKey) {
         Device device = new Device();

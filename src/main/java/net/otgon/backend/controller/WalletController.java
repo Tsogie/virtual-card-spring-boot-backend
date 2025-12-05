@@ -8,6 +8,7 @@ import net.otgon.backend.service.RedeemService;
 import net.otgon.backend.service.WalletService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 
 @RestController
@@ -32,6 +33,14 @@ public class WalletController {
         String token = authHeader.replace("Bearer ", "");
 
         return walletService.topup(token, request.getAmount());
+    }
+
+    // Global exception handler for this controller
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<String> handleResponseStatusException(ResponseStatusException ex) {
+        return ResponseEntity
+                .status(ex.getStatusCode())
+                .body(ex.getReason());
     }
 
 }

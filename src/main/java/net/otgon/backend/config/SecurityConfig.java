@@ -1,6 +1,7 @@
 package net.otgon.backend.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,6 +16,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -22,6 +24,10 @@ public class SecurityConfig {
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+    
+    // Read active profile to determine CORS settings
+    @Value("${spring.profiles.active:local}")
+    private String activeProfile;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -31,11 +37,21 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList(
+        
+        // DYNAMIC CORS based on environment
+        if ("prod".equals(activeProfile)) {
+            // PRODUCTION: Allow all origins (mobile apps can come from anywhere)
+            configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        } else {
+            // LOCAL DEVELOPMENT: Specific origins
+            configuration.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:8081",      // Metro bundler
                 "http://10.0.2.2:8081",       // Android emulator
-                "http://172.20.10.2:8081"     // Physical device
-        ));
+                "http://172.20.10.2:8081",    // Physical device (your network)
+                "http://192.168.*.*:8081"     // Any local network device
+            ));
+        }
+        
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
@@ -51,15 +67,24 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
+                        // PUBLIC ENDPOINTS (no authentication required)
                         .requestMatchers("/api/register", "/api/login").permitAll()
+                        .requestMatchers("/api/wallet/redeem").permitAll()  // NFC payments
+                        .requestMatchers("/api/health").permitAll()  // Health check
+                        .requestMatchers("/actuator/health").permitAll()  // Spring actuator
+                        
+                        // AUTHENTICATED ENDPOINTS (JWT required)
                         .requestMatchers("/api/transactions").authenticated()
-                        .requestMatchers("/api/wallet/redeem").permitAll()
                         .requestMatchers("/api/wallet/**").authenticated()
                         .requestMatchers("/api/device/**").authenticated()
                         .requestMatchers("/api/userinfo").authenticated()
+                        
+                        // ALL OTHER REQUESTS
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> 
+                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

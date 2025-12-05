@@ -54,13 +54,13 @@ public class Transaction {
      * PENDING (received), SUCCESS (balance updated), FAILED (signature invalid)
      */
     @Column(nullable = false, length = 20)
-    private String status = "PENDING";
+    private String status;
 
     @Column(length = 20)
     private boolean processed = false;
 
     /**
-     * Relationship to card (keep if you need card-bound wallets)
+     * Relationship to card
      */
     @ManyToOne
     @JoinColumn(name = "card_id")

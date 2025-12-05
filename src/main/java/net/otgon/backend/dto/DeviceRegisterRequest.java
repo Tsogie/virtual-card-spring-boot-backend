@@ -1,8 +1,12 @@
 package net.otgon.backend.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class DeviceRegisterRequest {
 
     private String alias;
+
+    @NotBlank(message = "Public key is required") // ← Add this
     private String publicKey;
 
     public DeviceRegisterRequest() {
