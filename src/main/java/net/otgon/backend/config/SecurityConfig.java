@@ -38,16 +38,14 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // DYNAMIC CORS based on environment
+        // CORS based on environment
         if ("prod".equals(activeProfile)) {
-            // PRODUCTION: Allow all origins (mobile apps can come from anywhere)
             configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         } else {
-            // LOCAL DEVELOPMENT: Specific origins
             configuration.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:8081",      // Metro bundler
                 "http://10.0.2.2:8081",       // Android emulator
-                "http://172.20.10.2:8081",    // Physical device (your network)
+                "http://172.20.10.2:8081",    // Physical device 
                 "http://192.168.*.*:8081"     // Any local network device
             ));
         }

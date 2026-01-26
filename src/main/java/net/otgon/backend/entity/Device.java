@@ -19,10 +19,6 @@ public class Device {
     @Column(length = 2048)
     private String publicKey;
 
-
-//    @Column(nullable = false, unique = true, length = 64)
-//    private String deviceKey; // e.g., UUID or random string
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

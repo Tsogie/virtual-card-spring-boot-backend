@@ -68,7 +68,7 @@ class WalletServiceTest {
         // Mock: User exists in database
         when(userRepo.findByUsername(username)).thenReturn(Optional.of(user));
 
-        // Mock: Card saved successfully (return updated card)
+        // Mock: Card saved successfully 
         when(cardRepo.save(any(Card.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -129,7 +129,7 @@ class WalletServiceTest {
         // Verify exception message
         assertEquals("Invalid token", exception.getMessage());
 
-        // Verify we never accessed the database (failed early)
+        // Verify we never accessed the database 
         verify(userRepo, never()).findByUsername(anyString());
     }
 
@@ -158,8 +158,6 @@ class WalletServiceTest {
                 "Expected ResponseStatusException for user not found"
         );
 
-        // Verify exception message
-        // Modify to getReason() because of ResponseStatusException
         assertEquals("User not found", exception.getReason());
 
         // Verify methods were called

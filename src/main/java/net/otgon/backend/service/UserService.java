@@ -116,12 +116,12 @@ public class UserService {
 
         String existingKey = existingDevice.getPublicKey();
 
-        // CASE 2: Device exists with same key → nothing to update
+        // CASE 2: Device exists with same key; nothing to update
         if (Objects.equals(existingKey, newKey)) {
             return new DeviceRegisterResponse(existingDevice.getId(), "Device already exists");
         }
 
-        // CASE 3: Device exists but key differs → replace device
+        // CASE 3: Device exists but key differs; replace device
         existingDevice.setPublicKey(newKey);
         existingDevice.setId(UUID.randomUUID().toString()); 
         deviceRepo.save(existingDevice);

@@ -221,7 +221,7 @@ class RedeemServiceTest {
         // ============ ASSERT ============
         assertNotNull(result);
         assertEquals("Insufficient funds", result.getStatus());
-        assertEquals(lowBalance, result.getNewBalance(), 0.01); // Balance unchanged
+        assertEquals(lowBalance, result.getNewBalance(), 0.01); 
         assertEquals(fare, result.getFareDeducted(), 0.01);
 
         // Verify balance was NOT deducted
@@ -249,7 +249,7 @@ class RedeemServiceTest {
 
         // Mock signature verification (INVALID - returns false)
         when(cryptoService.verify(any(byte[].class), any(byte[].class), eq(mockPublicKey)))
-                .thenReturn(false); // ← Signature verification fails
+                .thenReturn(false); 
 
         // Create request DTO with tampered signature
         RedeemDeviceRequestDto requestDto = createValidRedeemRequest(
@@ -279,7 +279,7 @@ class RedeemServiceTest {
         // Verify transaction was NOT saved
         verify(transactionRepo, never()).save(any(Transaction.class));
 
-        // Verify duplicate check was NOT performed (failed before that)
+        // Verify duplicate check was NOT performed 
         verify(transactionRepo, never()).existsByTxId(anyString());
     }
 
@@ -304,7 +304,7 @@ class RedeemServiceTest {
                 .thenReturn(true);
 
         // Mock transaction duplicate check (IS DUPLICATE)
-        when(transactionRepo.existsByTxId(testTxId)).thenReturn(true); // ← Already exists
+        when(transactionRepo.existsByTxId(testTxId)).thenReturn(true); 
 
         // Create request DTO
         RedeemDeviceRequestDto requestDto = createValidRedeemRequest(
@@ -320,7 +320,7 @@ class RedeemServiceTest {
         // ============ ASSERT ============
         assertNotNull(result);
         assertEquals("Already processed", result.getStatus());
-        assertEquals(currentBalance, result.getNewBalance(), 0.01); // Balance unchanged
+        assertEquals(currentBalance, result.getNewBalance(), 0.01); 
         assertEquals(fare, result.getFareDeducted(), 0.01);
 
         // Verify balance was NOT deducted
@@ -356,15 +356,12 @@ class RedeemServiceTest {
         when(cryptoService.verify(any(byte[].class), any(byte[].class), eq(mockPublicKey)))
                 .thenReturn(true);
 
-        // REMOVED: Mock transaction duplicate check - not reached due to timestamp validation
-        // when(transactionRepo.existsByTxId(testTxId)).thenReturn(false);
-
         // Create request DTO with expired timestamp
         RedeemDeviceRequestDto requestDto = createValidRedeemRequest(
                 testDeviceId,
                 testTxId,
                 5.0,
-                expiredTimestamp // ← Old timestamp
+                expiredTimestamp 
         );
 
         // ============ ACT & ASSERT ============
@@ -540,7 +537,7 @@ class RedeemServiceTest {
                 payloadJson.getBytes(StandardCharsets.UTF_8)
         );
 
-        // Mock signature (in real scenario, this would be ECDSA signature)
+        // Mock signature 
         String mockSignatureBase64 = Base64.getEncoder().encodeToString(
                 "mock-signature-bytes".getBytes()
         );

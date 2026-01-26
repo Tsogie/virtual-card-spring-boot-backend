@@ -52,16 +52,16 @@ class WalletControllerTest {
         RedeemResult mockResult = new RedeemResult();
         mockResult.setStatus("SUCCESS");
         mockResult.setNewBalance(17.50);
-        mockResult.setFareDeducted(2.50); // ← Changed from message
+        mockResult.setFareDeducted(2.50); 
 
         // 3. Mock service to return success
         when(redeemService.redeem(any(RedeemDeviceRequestDto.class)))
                 .thenReturn(mockResult);
 
         // ============ ACT & ASSERT ============
-        // 1. Make HTTP POST request to /api/wallet/redeem
-        // 2. Verify HTTP 200 OK status
-        // 3. Verify JSON response contains status, balance, and fareDeducted
+        // 1. make HTTP POST request to /api/wallet/redeem
+        // 2. verify HTTP 200 OK status
+        // 3. verify JSON response contains status, balance, and fareDeducted
         mockMvc.perform(post("/api/wallet/redeem")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{" +
@@ -73,7 +73,7 @@ class WalletControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("SUCCESS"))
                 .andExpect(jsonPath("$.newBalance").value(17.50))
-                .andExpect(jsonPath("$.fareDeducted").value(2.50)); // ← Changed
+                .andExpect(jsonPath("$.fareDeducted").value(2.50)); 
 
         // 4. Verify service was called once
         verify(redeemService, times(1)).redeem(any(RedeemDeviceRequestDto.class));
@@ -93,17 +93,17 @@ class WalletControllerTest {
         // 2. Create insufficient funds result
         RedeemResult mockResult = new RedeemResult();
         mockResult.setStatus("Insufficient funds");
-        mockResult.setNewBalance(2.00); // Balance too low
-        mockResult.setFareDeducted(0.0); // ← No fare deducted (transaction failed)
+        mockResult.setNewBalance(2.00); 
+        mockResult.setFareDeducted(0.0); 
 
         // 3. Mock service to return insufficient funds
         when(redeemService.redeem(any(RedeemDeviceRequestDto.class)))
                 .thenReturn(mockResult);
 
         // ============ ACT & ASSERT ============
-        // 1. Make HTTP POST request
-        // 2. Verify HTTP 200 OK (not error - just failed transaction)
-        // 3. Verify response indicates insufficient funds
+        // 1. make HTTP POST request
+        // 2. verify HTTP 200 OK 
+        // 3. verify response indicates insufficient funds
         mockMvc.perform(post("/api/wallet/redeem")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{" +
@@ -115,7 +115,7 @@ class WalletControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("Insufficient funds"))
                 .andExpect(jsonPath("$.newBalance").value(2.00))
-                .andExpect(jsonPath("$.fareDeducted").value(0.0)); // ← Changed
+                .andExpect(jsonPath("$.fareDeducted").value(0.0)); 
 
         // 4. Verify service was called
         verify(redeemService, times(1)).redeem(any(RedeemDeviceRequestDto.class));
@@ -136,9 +136,9 @@ class WalletControllerTest {
                 .thenThrow(new RuntimeException("Invalid signature"));
 
         // ============ ACT & ASSERT ============
-        // 1. Make HTTP POST request with invalid signature
-        // 2. Verify HTTP 500 Internal Server Error (unhandled exception)
-        // 3. Controller doesn't catch this exception, so it propagates
+        // 1. make HTTP POST request with invalid signature
+        // 2. verify HTTP 500 Internal Server Error (unhandled exception)
+        // 3. controller doesn't catch this exception, so it propagates
         mockMvc.perform(post("/api/wallet/redeem")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{" +
@@ -159,12 +159,10 @@ class WalletControllerTest {
     @Test
     @DisplayName("Test 4: Redeem Fails - Missing deviceId returns 400")
     void testRedeemMissingDeviceId() throws Exception {
-        // ============ ARRANGE ============
-        // No mock needed if DTO has @NotBlank validation
 
         // ============ ACT & ASSERT ============
         // 1. Make HTTP POST request missing required deviceId field
-        // 2. Verify HTTP 400 Bad Request (@Valid catches this)
+        // 2. Verify HTTP 400 Bad Request 
         // 3. Request body only has payload and signature
         mockMvc.perform(post("/api/wallet/redeem")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -174,7 +172,7 @@ class WalletControllerTest {
                                 "}"))
                 .andExpect(status().isBadRequest());
 
-        // 4. Verify service was NEVER called (validation failed)
+        // 4. Verify service was NEVER called
         verify(redeemService, never()).redeem(any(RedeemDeviceRequestDto.class));
     }
 
@@ -202,7 +200,7 @@ class WalletControllerTest {
         mockMvc.perform(put("/api/wallet/topup")
                         .header("Authorization", "Bearer valid.jwt.token")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"amount\":20.0}")) // ← Fixed: hardcoded value
+                        .content("{\"amount\":20.0}")) 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.newBalance").value(30.0))
@@ -233,7 +231,7 @@ class WalletControllerTest {
         mockMvc.perform(put("/api/wallet/topup")
                         .header("Authorization", "Bearer invalid.token")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"amount\":20.0}")) // ← Fixed: hardcoded value
+                        .content("{\"amount\":20.0}")) 
                 .andExpect(status().isInternalServerError());
 
         // 4. Verify service was called
@@ -273,7 +271,7 @@ class WalletControllerTest {
     @DisplayName("Test 8: Top Up Fails - Missing auth header returns 400")
     void testTopupMissingHeader() throws Exception {
         // ============ ARRANGE ============
-        // No mock needed - Spring catches missing header
+        // Spring catches missing header
 
         // ============ ACT & ASSERT ============
         // 1. Make HTTP PUT request WITHOUT Authorization header

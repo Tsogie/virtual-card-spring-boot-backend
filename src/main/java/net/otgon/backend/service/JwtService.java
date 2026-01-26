@@ -37,11 +37,9 @@ public class JwtService {
                     .parseClaimsJws(token);
             return claimsJws.getBody().getSubject();
         } catch (ExpiredJwtException e) {
-            // Log at INFO level instead of ERROR - this is expected behavior
             System.out.println("[JWT] Token expired for user: " + e.getClaims().getSubject());
             throw new RuntimeException("Token expired", e);
         } catch (JwtException e) {
-            // This is unexpected - log as warning
             System.out.println("[JWT] Invalid token: " + e.getMessage());
             throw new RuntimeException("Invalid token", e);
         }
@@ -51,7 +49,7 @@ public class JwtService {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hour
+                .setExpiration(new Date(System.currentTimeMillis() + 3600000)) 
                 .signWith(getSecretKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

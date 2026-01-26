@@ -117,7 +117,6 @@ public class TransactionServiceTest {
         assertEquals(4, result.size());
 
         // 3. Verify transactions are sorted by timestamp (newest first)
-        // The most recent should be topup2 (30 min ago)
         assertEquals("topup-2", result.get(0).getId());
         assertEquals("TOPUP", result.get(0).getType());
         assertEquals(10.0, result.get(0).getAmount());
@@ -155,7 +154,7 @@ public class TransactionServiceTest {
         String token = "valid.jwt.token";
         String username = "alice";
 
-        // Create mock user with card (new user, no transactions yet)
+        // Create mock user with card 
         User user = new User();
         user.setUsername(username);
 
@@ -220,7 +219,7 @@ public class TransactionServiceTest {
         // Verify exception message
         assertEquals("Invalid token", exception.getMessage());
 
-        // Verify we never accessed the database (failed early)
+        // Verify we never accessed the database 
         verify(userRepo, never()).findByUsername(anyString());
     }
     // =====================================================

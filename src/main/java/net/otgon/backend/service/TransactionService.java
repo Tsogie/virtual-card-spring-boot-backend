@@ -61,7 +61,7 @@ public class TransactionService {
             dto.setAmount(tx.getAmount());
             dto.setTimestamp(tx.getSyncedAt());
             dto.setStatus(tx.getStatus());
-            dto.setBalanceAfter(0.0); // We'll calculate this later if needed
+            dto.setBalanceAfter(0.0); 
             allTransactions.add(dto);
         }
 

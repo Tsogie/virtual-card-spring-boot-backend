@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(DeviceController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@DisplayName("DeviceController Integration Tests")
+@DisplayName("DeviceController Unit Tests")
 class DeviceControllerTest {
 
     @Autowired
@@ -91,7 +91,7 @@ class DeviceControllerTest {
 
         // ============ ACT & ASSERT ============
         // 1. Make HTTP POST request
-        // 2. Verify HTTP 200 OK (not an error - just returns existing device)
+        // 2. Verify HTTP 200 OK 
         // 3. Verify response contains existing deviceId and appropriate message
         mockMvc.perform(post("/api/device/register")
                         .header("Authorization", "Bearer valid.jwt.token")
@@ -131,7 +131,7 @@ class DeviceControllerTest {
                 .andExpect(jsonPath("$.deviceId").isEmpty())
                 .andExpect(jsonPath("$.message").value("Error: Invalid token"));
 
-        // 4. Verify service was called (and threw exception)
+        // 4. Verify service was called 
         verify(userService, times(1)).registerDevice(eq("invalid.token"), any(DeviceRegisterRequest.class));
     }
 
@@ -175,18 +175,16 @@ class DeviceControllerTest {
         // 1. Create request data
         String publicKey = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE...";
 
-        // No mock needed - Spring will catch missing header before service is called
-
         // ============ ACT & ASSERT ============
         // 1. Make HTTP POST request WITHOUT Authorization header
-        // 2. Verify HTTP 400 Bad Request (missing required header)
+        // 2. Verify HTTP 400 Bad Request
         // 3. Spring catches this before reaching controller method
         mockMvc.perform(post("/api/device/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"publicKey\":\"" + publicKey + "\",\"alias\":\"My Phone\"}"))
                 .andExpect(status().isBadRequest());
 
-        // 4. Verify service was NEVER called (failed at framework level)
+        // 4. Verify service was NEVER called 
         verify(userService, never()).registerDevice(anyString(), any(DeviceRegisterRequest.class));
     }
 
@@ -201,7 +199,7 @@ class DeviceControllerTest {
 
         // ============ ACT & ASSERT ============
         // 1. Make HTTP POST request with missing publicKey field
-        // 2. Verify HTTP 400 Bad Request (@Valid annotation catches this)
+        // 2. Verify HTTP 400 Bad Request 
         // 3. Request body only has alias, missing required publicKey
         mockMvc.perform(post("/api/device/register")
                         .header("Authorization", "Bearer valid.jwt.token")
@@ -209,7 +207,7 @@ class DeviceControllerTest {
                         .content("{\"alias\":\"My Phone\"}"))
                 .andExpect(status().isBadRequest());
 
-        // 4. Verify service was NEVER called (validation failed first)
+        // 4. Verify service was NEVER called
         verify(userService, never()).registerDevice(anyString(), any(DeviceRegisterRequest.class));
     }
 }

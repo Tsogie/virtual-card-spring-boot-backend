@@ -75,7 +75,7 @@ class UserServiceTest {
         // Mock: Password encoder hashes the password
         when(passwordEncoder.encode(password)).thenReturn(hashedPassword);
 
-        // Mock: UserRepo saves the user (return the same user)
+        // Mock: UserRepo saves the user 
         when(userRepo.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Mock: JWT service generates token
@@ -141,7 +141,7 @@ class UserServiceTest {
         // Verify user was NOT saved
         verify(userRepo, never()).save(any(User.class));
 
-        // Verify password was NOT hashed (failed before that)
+        // Verify password was NOT hashed 
         verify(passwordEncoder, never()).encode(anyString());
     }
 
@@ -176,7 +176,7 @@ class UserServiceTest {
         // Verify user was NOT saved
         verify(userRepo, never()).save(any(User.class));
 
-        // Verify password was NOT hashed (failed before that)
+        // Verify password was NOT hashed 
         verify(passwordEncoder, never()).encode(anyString());
     }
 
@@ -195,7 +195,7 @@ class UserServiceTest {
 
         // Mock: Password MATCHES
         // When passwordEncoder.matches("password123", "$2a$10$hashedExample") is called
-        // Return TRUE (meaning password is correct)
+        // Return TRUE 
         when(passwordEncoder.matches(plainPassword, hashedPassword)).thenReturn(true);
 
         // Mock: JWT service generates token
@@ -239,7 +239,7 @@ class UserServiceTest {
         // Verify repository was called
         verify(userRepo, times(1)).findByUsername(nonExistingUsername);
 
-        // Verify password check was NEVER called (threw exception before reaching it)
+        // Verify password check was NEVER called 
         verify(passwordEncoder, never()).matches(anyString(), anyString());
 
         // Verify JWT was NEVER generated
@@ -353,11 +353,11 @@ class UserServiceTest {
         String validToken = "valid.token";
         String deletedUsername = "deletedUser";
 
-        // Mock: JWT service extracts username (token is valid)
+        // Mock: JWT service extracts username 
         when(jwtService.extractUsername(validToken)).thenReturn(deletedUsername);
 
-        // Mock: User does NOT exist in database (was deleted)
-        when(userRepo.findByUsername(deletedUsername)).thenReturn(Optional.empty()); // ← ADD THIS
+        // Mock: User does NOT exist in database 
+        when(userRepo.findByUsername(deletedUsername)).thenReturn(Optional.empty()); 
 
         // ============ ACT & ASSERT ============
         RuntimeException exception = assertThrows(
@@ -403,7 +403,7 @@ class UserServiceTest {
         // Mock: Device does NOT exist yet
         when(deviceRepo.findByUser(user)).thenReturn(Optional.empty());
 
-        // Mock: Device repo saves the device (return device with generated ID)
+        // Mock: Device repo saves the device 
         when(deviceRepo.save(any(Device.class))).thenAnswer(invocation -> {
             Device savedDevice = invocation.getArgument(0);
             savedDevice.setId(UUID.randomUUID().toString());
@@ -489,7 +489,7 @@ class UserServiceTest {
         // 5. Same existing device returned
         assertEquals(existingDevice.getId(), response.getDeviceId());
 
-        // 6. Verify NO new device was saved (didn't create duplicate)
+        // 6. Verify NO new device was saved 
         verify(deviceRepo, never()).save(any(Device.class));
     }
 
@@ -518,7 +518,7 @@ class UserServiceTest {
         // The exception message comes directly from JwtService
         assertEquals("Invalid token", exception.getMessage());
 
-        // Verify JWT service was called (proves we attempted token validation)
+        // Verify JWT service was called 
         verify(jwtService, times(1)).extractUsername(invalidToken);
 
         // Verify device repo was never accessed

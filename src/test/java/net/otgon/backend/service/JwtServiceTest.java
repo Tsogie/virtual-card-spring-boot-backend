@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Unit tests for JwtService
  * Service. 1. generates signed token with secret key, 2. extracts username from token
  */
-@SpringBootTest // ← Use real Spring context
+@SpringBootTest 
 @TestPropertySource(properties = {
         "jwt.secret=dGVzdFNlY3JldEtleUZvclVuaXRUZXN0aW5nTWluaW11bTMyQ2hhcnNMb25nMTIzNDU=",
         "jwt.expiration=3600000"
@@ -42,7 +42,7 @@ public class JwtServiceTest {
         String token = Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hour
+                .setExpiration(new Date(System.currentTimeMillis() + 3600000)) 
                 .signWith(jwtService.getSecretKey(), SignatureAlgorithm.HS256)
                 .compact();
 
@@ -64,8 +64,8 @@ public class JwtServiceTest {
         // Create an expired token using the real service's secret key
         String token = Jwts.builder()
                 .setSubject(username)
-                .setIssuedAt(new Date(System.currentTimeMillis() - 7200000)) // 2 hours ago created
-                .setExpiration(new Date(System.currentTimeMillis() - 3600000)) // 1 hour expired
+                .setIssuedAt(new Date(System.currentTimeMillis() - 7200000)) 
+                .setExpiration(new Date(System.currentTimeMillis() - 3600000)) 
                 .signWith(jwtService.getSecretKey(), SignatureAlgorithm.HS256)
                 .compact();
 
@@ -116,7 +116,7 @@ public class JwtServiceTest {
         // ============ ARRANGE ============
         String username = "testuser";
 
-        // Create a DIFFERENT secret key (wrong one)
+        // Create a DIFFERENT secret key 
         SecretKey wrongKey = Keys.hmacShaKeyFor(
                 "wrongSecretKeyThatIsAtLeast32CharactersLongForTesting123".getBytes()
         );

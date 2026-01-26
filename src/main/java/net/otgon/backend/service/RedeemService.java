@@ -112,7 +112,7 @@ public class RedeemService {
         }
 
         long currentTime = System.currentTimeMillis();
-        long maxAge = 24 * 60 * 60 * 1000; // 24 hours timestamp
+        long maxAge = 24 * 60 * 60 * 1000; 
 
         if (Math.abs(currentTime - timestamp) > maxAge) {
             log.error("Transaction expired: timestamp outside 24-hour window");
@@ -138,7 +138,7 @@ public class RedeemService {
 
         // 8. Check balance
         if (currentBalance < fare) {
-            log.warn("❌ INSUFFICIENT FUNDS");
+            log.warn("INSUFFICIENT FUNDS");
             log.warn("Required: €{}, Available: €{}, Shortfall: €{}",
                     String.format("%.2f", fare),
                     String.format("%.2f", currentBalance),

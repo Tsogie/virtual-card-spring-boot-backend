@@ -85,9 +85,7 @@ class TransactionControllerTest {
     @Test
     @DisplayName("Test 3: Get Transactions Fails - Missing auth header returns 400")
     void testGetTransactionsMissingHeader() throws Exception {
-        // ============ ARRANGE ============
-        // No mock needed
-
+      
         // ============ ACT & ASSERT ============
         mockMvc.perform(get("/api/transactions"))
                 .andExpect(status().isBadRequest());
