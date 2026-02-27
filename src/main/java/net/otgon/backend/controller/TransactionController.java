@@ -28,7 +28,6 @@ public class TransactionController {
 
         try {
             String token = authHeader.replace("Bearer ", "");
-            System.out.println("Getting transactions: " + token);
 
             List<TransactionResponseDto> transactions =
                     transactionService.getAllUserTransactions(token);

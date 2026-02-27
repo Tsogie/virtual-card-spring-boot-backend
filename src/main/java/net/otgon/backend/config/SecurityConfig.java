@@ -70,12 +70,14 @@ public class SecurityConfig {
                         .requestMatchers("/api/wallet/redeem").permitAll()  // NFC payments
                         .requestMatchers("/api/health").permitAll()  // Health check
                         .requestMatchers("/actuator/health").permitAll()  // Spring actuator
-                        
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+
                         // AUTHENTICATED ENDPOINTS (JWT required)
                         .requestMatchers("/api/transactions").authenticated()
                         .requestMatchers("/api/wallet/**").authenticated()
                         .requestMatchers("/api/device/**").authenticated()
                         .requestMatchers("/api/userinfo").authenticated()
+
                         
                         // ALL OTHER REQUESTS
                         .anyRequest().authenticated()
