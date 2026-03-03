@@ -8,7 +8,6 @@ import net.otgon.backend.entity.Device;
 import net.otgon.backend.entity.User;
 import net.otgon.backend.repository.DeviceRepo;
 import net.otgon.backend.repository.UserRepo;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +20,6 @@ public class UserService {
     private final DeviceRepo deviceRepo;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
-
-    @Value("${jwt.expiration:3600000}")
-    private long jwtExpiration;
 
     public UserService(UserRepo userRepo,
                        DeviceRepo deviceRepo,

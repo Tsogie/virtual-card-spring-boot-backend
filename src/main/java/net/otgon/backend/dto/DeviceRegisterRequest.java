@@ -6,7 +6,7 @@ public class DeviceRegisterRequest {
 
     private String alias;
 
-    @NotBlank(message = "Public key is required") // ← Add this
+    @NotBlank(message = "Public key is required")
     private String publicKey;
 
     public DeviceRegisterRequest() {

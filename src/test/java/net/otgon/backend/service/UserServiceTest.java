@@ -44,12 +44,6 @@ class UserServiceTest {
     @Mock
     private JwtService jwtService;
 
-    // Test data
-    private Device mockDevice;
-    private User mockUser;
-    private Card mockCard;
-    private String testDeviceId;
-
     @BeforeEach
     void setUp() {
     }
