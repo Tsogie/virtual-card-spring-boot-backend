@@ -16,6 +16,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -46,7 +47,7 @@ public class WalletTest {
 
         //Arrange
         String token = "token";
-        double amount = 10;
+        double amount = 100;
 
         String username = "username";
         User user = createUserByUsername(username);
@@ -107,6 +108,114 @@ public class WalletTest {
         verify(topUpTransactionRepo, never()).save(any());
 
     }
+
+    //TEST-3 FAIL: AMOUNT IS NEGATIVE
+    @Test
+    @DisplayName("Fail: top up with negative amount")
+    void topupWithNegativeAmount(){
+        //Arrange
+        String token = "token";
+        double negativeAmount = -1;
+
+        //Act & Assert
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> walletService.topup(token, negativeAmount),
+                "Expected ResponseStatusException for negative amount");
+
+        assertEquals("Amount must be positive", exception.getReason());
+        verify(cardRepo, never()).save(any(Card.class));
+        verify(topUpTransactionRepo, never()).save(any());
+    }
+
+    //TEST-4 FAIL: AMOUNT EXCEEDS 100
+    @Test
+    @DisplayName("Fail: top up with exceeded amount")
+    void topupWithExceededAmount(){
+
+        //Arrange
+        String token = "token";
+        double exceededAmount = 101;
+
+        //Act & Assert
+        ResponseStatusException e = assertThrows(
+                ResponseStatusException.class,
+                ()-> walletService.topup(token, exceededAmount),
+                "Expected ResponseStatusException for exceeded amount");
+        assertEquals("Amount exceeds maximum (€100)", e.getReason());
+        verify(cardRepo, never()).save(any(Card.class));
+        verify(topUpTransactionRepo, never()).save(any());
+    }
+    
+    // TEST-5 FAIL: TOP UP AMOUNT IS ZERO
+    @Test
+    @DisplayName("Fail: top up with zero")
+    void topupWithAmountZero(){
+
+        //Arrange
+        String token = "token";
+        double zeroAmount = 0;
+
+        //Act & Assert
+        ResponseStatusException e = assertThrows(
+                ResponseStatusException.class,
+                ()-> walletService.topup(token, zeroAmount),
+                "Expected ResponseStatusException for amount of zero");
+        assertEquals("Amount must be positive", e.getReason());
+        verify(cardRepo, never()).save(any(Card.class));
+        verify(topUpTransactionRepo, never()).save(any());
+    }
+
+    //TEST-6 FAIL: USER NOT FOUND
+    @Test
+    @DisplayName("Fail: top up with 100")
+    void topupWhenUserNotFound(){
+
+        //Arrange
+        String token = "token";
+        double amount = 10;
+        String username = "alice";
+
+        when(jwtService.extractUsername(token)).thenReturn(username);
+        when(userRepo.findByUsername(username)).thenReturn(Optional.empty());
+
+        //Act & Assert
+        ResponseStatusException e = assertThrows(
+                ResponseStatusException.class,
+                ()-> walletService.topup(token, amount),
+                "Expected ResponseStatusException for user not found");
+        assertEquals("User not found", e.getReason());
+        verify(cardRepo, never()).save(any(Card.class));
+        verify(topUpTransactionRepo, never()).save(any());
+    }
+
+    //TEST-7 FAIL: CARD NOT FOUND
+    @Test
+    @DisplayName("Fail: card not found")
+    void topupWhenCardNotFound(){
+
+        //Arrange
+        String token = "token";
+        double amount = 10;
+        String username = "alice";
+        User user = createUserByUsername(username);
+        user.setCard(null);
+
+        when(jwtService.extractUsername(token)).thenReturn(username);
+        when(userRepo.findByUsername(username)).thenReturn(Optional.of(user));
+
+        //Act & Arrange
+        ResponseStatusException e = assertThrows(
+                ResponseStatusException.class,
+                () -> walletService.topup(token, amount),
+                "Expected ResponseStatusException for card not found"
+        );
+
+        assertEquals("Card not found for user", e.getReason());
+        verify(cardRepo, never()).save(any(Card.class));
+        verify(topUpTransactionRepo, never()).save(any());
+    }
+
     User createUserByUsername(String username){
         User user = new User();
         user.setUsername(username);
