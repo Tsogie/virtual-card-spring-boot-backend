@@ -119,7 +119,6 @@ public class TransactionTest {
         //Arrange
         String invalidToken = "invalid.token";
         String username = "alice";
-        User user = createUserByUsername(username);
 
         when(jwtService.extractUsername(invalidToken))
                 .thenThrow(new RuntimeException("Invalid token"));
