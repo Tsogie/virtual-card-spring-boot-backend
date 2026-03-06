@@ -52,21 +52,40 @@ public class RedeemService {
         log.info("Device ID: {}", dto.getDeviceId());
 
         // 1. Load device
-        Device device = deviceRepo.findById(dto.getDeviceId())
-                .orElseThrow(() -> new RuntimeException("Device not registered"));
-
-        log.info("Device found: {} (User ID: {})", device.getId(), device.getUser().getId());
+        Device device = loadDevice(dto.getDeviceId());
 
         // 2. Load public key, converting base64 string stored in db to PublicKey object
-        log.debug("Public key (Base64): {}", device.getPublicKey());
+        // 3. Decode raw payload bytes (Base64)
+        // 4. Verify signature
+        // 5. Parse JSON inside payload
+        TransactionPayload payload = verifyAndParsePayload(device, dto.getPayload(), dto.getSignature());
+
+        // Validate fare amount
+        validatePayload(payload);
+
+        // 6. Prevent duplicate processing
+        // 7. Get user and card
+        // 8. Check balance
+        // 9. Deduct balance
+        // 10. Save transaction
+        return processTransaction(device, payload, dto.getSignature());
+    }
+
+    Device loadDevice(String deviceId) {
+        Device device = deviceRepo.findById(deviceId)
+                .orElseThrow(() -> new RuntimeException("Device not registered"));
+        log.info("Device found: {} (User ID: {})", device.getId(), device.getUser().getId());
+        return device;
+    }
+
+    TransactionPayload verifyAndParsePayload(Device device,String payload, String signature ){
+
+        // 2. Load public key, converting base64 string stored in db to PublicKey object
         PublicKey pubKey = cryptoService.loadPublicKey(device.getPublicKey());
 
         // 3. Decode raw payload bytes (Base64)
-        byte[] payloadBytes = Base64.getDecoder().decode(dto.getPayload());
-        byte[] signatureBytes = Base64.getDecoder().decode(dto.getSignature());
-
-        log.debug("Payload bytes length: {}", payloadBytes.length);
-        log.debug("Signature bytes length: {}", signatureBytes.length);
+        byte[] payloadBytes = Base64.getDecoder().decode(payload);
+        byte[] signatureBytes = Base64.getDecoder().decode(signature);
 
         // 4. Verify signature
         log.info("Verifying ECDSA signature...");
@@ -85,23 +104,21 @@ public class RedeemService {
         String json = new String(payloadBytes, StandardCharsets.UTF_8);
         log.debug("Decoded payload JSON: {}", json);
 
-        TransactionPayload payload;
+        TransactionPayload transactionPayload;
         try {
-            payload = objectMapper.readValue(json, TransactionPayload.class);
+            transactionPayload = objectMapper.readValue(json, TransactionPayload.class);
         } catch (JsonProcessingException e) {
             log.error("Failed to parse transaction payload JSON", e);
             throw new RuntimeException("Invalid payload JSON", e);
         }
+        return transactionPayload;
+    }
 
-        String txId = payload.getTxId();
-        double fare = payload.getFare();
-        long timestamp = payload.getTimestamp();
+    void validatePayload(TransactionPayload transactionPayload) {
 
-        log.info("Transaction ID: {}", txId);
-        log.info("Fare amount: €{}", String.format("%.2f", fare));
-        log.info("Timestamp: {} ({}ms)", new java.util.Date(timestamp), timestamp);
+        double fare = transactionPayload.getFare();
+        long timestamp = transactionPayload.getTimestamp();
 
-        // Validate fare amount
         if (fare <= 0) {
             log.error("Invalid fare: amount must be positive (received: €{})", fare);
             throw new ValidationException("Invalid fare: amount must be positive");
@@ -112,7 +129,7 @@ public class RedeemService {
         }
 
         long currentTime = System.currentTimeMillis();
-        long maxAge = 24 * 60 * 60 * 1000; 
+        long maxAge = 24 * 60 * 60 * 1000;
 
         if (Math.abs(currentTime - timestamp) > maxAge) {
             log.error("Transaction expired: timestamp outside 24-hour window");
@@ -121,9 +138,14 @@ public class RedeemService {
             throw new ValidationException("Transaction expired: timestamp outside 24-hour window");
         }
 
-        log.info("✓ Timestamp valid (within 24-hour window)");
+    }
 
-        // 6. Prevent duplicate processing
+    RedeemResult processTransaction(Device device, TransactionPayload transactionPayload, String signature) {
+
+        String txId = transactionPayload.getTxId();
+        double fare = transactionPayload.getFare();
+        long timestamp = transactionPayload.getTimestamp();
+
         if (transactionRepo.existsByTxId(txId)) {
             log.warn("⚠ Transaction already processed: {}", txId);
             Card card = device.getUser().getCard();
@@ -162,7 +184,7 @@ public class RedeemService {
         tx.setCard(card);
         tx.setType("DEDUCT");
         tx.setAmount(fare);
-        tx.setSignature(dto.getSignature());
+        tx.setSignature(signature);
         tx.setTimestamp(timestamp);
         tx.setStatus("SUCCESS");
         tx.setProcessed(true);
@@ -172,5 +194,6 @@ public class RedeemService {
         log.info("=== TRANSACTION PROCESSING COMPLETED SUCCESSFULLY ===");
 
         return new RedeemResult("Success", newBalance, fare);
+
     }
 }
