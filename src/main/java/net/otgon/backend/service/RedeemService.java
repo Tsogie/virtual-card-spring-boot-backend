@@ -78,7 +78,7 @@ public class RedeemService {
         return device;
     }
 
-    TransactionPayload verifyAndParsePayload(Device device,String payload, String signature ){
+    public TransactionPayload verifyAndParsePayload(Device device, String payload, String signature ){
 
         // 2. Load public key, converting base64 string stored in db to PublicKey object
         PublicKey pubKey = cryptoService.loadPublicKey(device.getPublicKey());
@@ -114,7 +114,7 @@ public class RedeemService {
         return transactionPayload;
     }
 
-    void validatePayload(TransactionPayload transactionPayload) {
+    public void validatePayload(TransactionPayload transactionPayload) {
 
         double fare = transactionPayload.getFare();
         long timestamp = transactionPayload.getTimestamp();
@@ -140,7 +140,7 @@ public class RedeemService {
 
     }
 
-    RedeemResult processTransaction(Device device, TransactionPayload transactionPayload, String signature) {
+    public RedeemResult processTransaction(Device device, TransactionPayload transactionPayload, String signature) {
 
         String txId = transactionPayload.getTxId();
         double fare = transactionPayload.getFare();

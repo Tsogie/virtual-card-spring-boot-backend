@@ -185,7 +185,7 @@ public class CryptoTest {
 
     }
 
-    //Helper method to create signature and payload in bytes
+    //Helper method to create payload in bytes
     private byte[] createPayload(String txId, double fare, long timestamp){
 
         JSONObject payload = new JSONObject();
