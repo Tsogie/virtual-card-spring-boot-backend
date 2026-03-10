@@ -1,6 +1,5 @@
 package net.otgon.backend.controller;
 
-import net.otgon.backend.service.JwtService;
 import net.otgon.backend.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,9 +28,6 @@ class UserControllerTest {
 
     @MockitoBean
     private UserService userService;
-
-    @MockitoBean
-    private JwtService jwtService;
 
     // =====================================================
     // TEST 1: POST /api/register - SUCCESS

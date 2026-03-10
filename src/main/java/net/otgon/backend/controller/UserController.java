@@ -51,12 +51,12 @@ public class UserController {
         try {
             token = userService.loginWithPassword(username, password);
         } catch (Exception e) {
+            if (e.getMessage().equals("User not found")) {
+                return ResponseEntity.status(404).body("User not found");
+            }
             return ResponseEntity.status(401).body("Invalid credentials");
         }
 
-        if (token == null) {
-            return ResponseEntity.status(404).body("User not found");
-        }
         System.out.println("[LogIn] Sending token: " + token);
 
         return ResponseEntity.ok(token);
