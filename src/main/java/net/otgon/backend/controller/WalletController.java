@@ -42,5 +42,11 @@ public class WalletController {
                 .status(ex.getStatusCode())
                 .body(ex.getReason());
     }
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
+        return ResponseEntity
+                .status(400)
+                .body(ex.getMessage());
+    }
 
 }

@@ -147,7 +147,7 @@ class WalletControllerTest {
                                 "\"payload\":\"base64Payload\"," +
                                 "\"signature\":\"tamperedSignature\"" +
                                 "}"))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
 
         // 4. Verify service was called
         verify(redeemService, times(1)).redeem(any(RedeemDeviceRequestDto.class));
