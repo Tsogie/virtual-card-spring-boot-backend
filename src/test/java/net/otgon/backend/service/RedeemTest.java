@@ -1,4 +1,4 @@
-package net.otgon.backend.unitTest;
+package net.otgon.backend.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.minidev.json.JSONObject;
@@ -13,8 +13,6 @@ import net.otgon.backend.exception.ValidationException;
 import net.otgon.backend.repository.CardRepo;
 import net.otgon.backend.repository.DeviceRepo;
 import net.otgon.backend.repository.TransactionRepo;
-import net.otgon.backend.service.CryptoService;
-import net.otgon.backend.service.RedeemService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

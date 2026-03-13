@@ -1,6 +1,5 @@
-package net.otgon.backend.controllerUnitTest;
+package net.otgon.backend.controller;
 
-import net.otgon.backend.controller.DeviceController;
 import net.otgon.backend.dto.DeviceRegisterRequest;
 import net.otgon.backend.dto.DeviceRegisterResponse;
 import net.otgon.backend.service.JwtService;

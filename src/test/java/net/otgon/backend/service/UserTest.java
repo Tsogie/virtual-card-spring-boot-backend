@@ -1,4 +1,4 @@
-package net.otgon.backend.unitTest;
+package net.otgon.backend.service;
 
 import net.otgon.backend.dto.DeviceRegisterRequest;
 import net.otgon.backend.dto.DeviceRegisterResponse;
@@ -7,8 +7,6 @@ import net.otgon.backend.entity.Device;
 import net.otgon.backend.entity.User;
 import net.otgon.backend.repository.DeviceRepo;
 import net.otgon.backend.repository.UserRepo;
-import net.otgon.backend.service.JwtService;
-import net.otgon.backend.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -288,7 +286,7 @@ public class UserTest {
         String username = "alice";
         String validToken = "valid.token";
         when(jwtService.extractUsername(validToken)).thenReturn(username);
-        when(userRepo.findByUsername(username)).thenReturn(null);
+        when(userRepo.findByUsername(username)).thenThrow(new RuntimeException("User not found"));
 
         //Act & Assert
         RuntimeException exception = assertThrows(

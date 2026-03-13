@@ -1,9 +1,7 @@
-package net.otgon.backend.controllerUnitTest;
+package net.otgon.backend.controller;
 
-import net.otgon.backend.controller.WalletController;
 import net.otgon.backend.dto.RedeemDeviceRequestDto;
 import net.otgon.backend.dto.RedeemResult;
-import net.otgon.backend.dto.TopUpRequest;
 import net.otgon.backend.dto.TopUpResponse;
 import net.otgon.backend.service.JwtService;
 import net.otgon.backend.service.RedeemService;

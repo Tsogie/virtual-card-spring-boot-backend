@@ -1,4 +1,4 @@
-package net.otgon.backend.unitTest;
+package net.otgon.backend.service;
 
 import net.otgon.backend.dto.TransactionResponseDto;
 import net.otgon.backend.entity.Card;
@@ -8,8 +8,6 @@ import net.otgon.backend.entity.User;
 import net.otgon.backend.repository.TopUpTransactionRepo;
 import net.otgon.backend.repository.TransactionRepo;
 import net.otgon.backend.repository.UserRepo;
-import net.otgon.backend.service.JwtService;
-import net.otgon.backend.service.TransactionService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

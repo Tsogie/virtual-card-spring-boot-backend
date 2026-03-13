@@ -1,6 +1,5 @@
-package net.otgon.backend.controllerUnitTest;
+package net.otgon.backend.controller;
 
-import net.otgon.backend.controller.UserController;
 import net.otgon.backend.service.JwtService;
 import net.otgon.backend.service.UserService;
 import org.junit.jupiter.api.DisplayName;

@@ -1,6 +1,5 @@
-package net.otgon.backend.controllerUnitTest;
+package net.otgon.backend.controller;
 
-import net.otgon.backend.controller.TransactionController;
 import net.otgon.backend.dto.TransactionResponseDto;
 import net.otgon.backend.service.JwtService;
 import net.otgon.backend.service.TransactionService;

@@ -21,8 +21,8 @@ public class JwtService {
 
     @PostConstruct
     void init() {
-        if (jwtSecret == null || jwtSecret.isEmpty()) {
-            throw new RuntimeException("JWT secret is not configured");
+        if (jwtSecret == null || jwtSecret.isBlank()) {
+            throw new IllegalStateException("JWT secret is not configured — check JWT_SECRET env var");
         }
         secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
@@ -47,6 +47,8 @@ public class JwtService {
         } catch (JwtException e) {
             System.out.println("[JWT] Invalid token: " + e.getMessage());
             throw new RuntimeException("Invalid token", e);
+        } catch (Exception e) {
+            throw new RuntimeException("[JWT] Unexpected exception", e);
         }
     }
 
