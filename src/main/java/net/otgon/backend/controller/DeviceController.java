@@ -27,7 +27,7 @@ public class DeviceController {
             // Return 401 with a minimal response containing error info
             DeviceRegisterResponse errorResponse = new DeviceRegisterResponse(
                     null,
-                    "Error: " + e.getMessage()
+                    e.getMessage()
             );
             return ResponseEntity.status(401).body(errorResponse);
         }
