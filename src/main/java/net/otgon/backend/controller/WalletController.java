@@ -26,13 +26,15 @@ public class WalletController {
     }
 
     @PutMapping("/topup")
-    public TopUpResponse topup(
+    public ResponseEntity<TopUpResponse> topup(
             @RequestHeader("Authorization") String authHeader,
             @RequestBody TopUpRequest request) {
         // Extract JWT from "Bearer <token>"
         String token = authHeader.replace("Bearer ", "");
 
-        return walletService.topup(token, request.getAmount());
+        //return walletService.topup(token, request.getAmount());
+        TopUpResponse response = walletService.topup(token, request.getAmount());
+        return ResponseEntity.ok(response);
     }
 
     // Global exception handler for this controller

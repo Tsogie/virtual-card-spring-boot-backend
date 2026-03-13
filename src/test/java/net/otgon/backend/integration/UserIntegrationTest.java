@@ -31,13 +31,13 @@ public class UserIntegrationTest {
 
     @BeforeEach
     public void setup() throws Exception {
-        requestBody = String.format("""
+        requestBody = """
                 {
                 "username": "alice",
                 "password": "password",
                 "email": "test@test.com"
                 }
-                """);
+                """;
         mockMvc.perform(post("/api/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody));
@@ -163,8 +163,5 @@ public class UserIntegrationTest {
                         .header("Authorization", "Bearer " + malformedToken))
                 .andExpect(status().isForbidden());
     }
-
-
-
 
 }
