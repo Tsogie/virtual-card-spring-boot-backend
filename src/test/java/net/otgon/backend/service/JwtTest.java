@@ -3,10 +3,12 @@ package net.otgon.backend.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("JwtService unit tests")
+@ActiveProfiles("test")
 public class JwtTest {
 
     private JwtService jwtService;

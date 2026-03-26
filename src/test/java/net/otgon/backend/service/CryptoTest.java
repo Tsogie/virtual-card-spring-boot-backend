@@ -4,6 +4,7 @@ import net.minidev.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.nio.charset.StandardCharsets;
 import java.security.*;
@@ -13,6 +14,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Unit tests for Transaction Service")
+@ActiveProfiles("test")
 public class CryptoTest {
 
     PublicKey publicKey;
