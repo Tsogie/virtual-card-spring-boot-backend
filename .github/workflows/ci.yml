@@ -20,4 +20,10 @@ jobs:
       - name: Testing
         run: mvn test
 
+      - name: Run security scanning
+        run: |
+          curl -f --max-time 60 -X POST https://api-security-scanner-1.onrender.com/api/scan/validate \
+          -H "Content-Type: application/json" \
+          -d '{"specUrl": "https://virtual-card-spring-boot-backend.onrender.com/v3/api-docs"}'
+
 
